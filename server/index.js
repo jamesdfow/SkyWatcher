@@ -7,6 +7,7 @@ API keys are stored in .env and never exposed to the client
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import axios from 'axios';
 
 //Load environment variables from .env file in process.env
 dotenv.config();
@@ -27,6 +28,24 @@ app.use(express.json());
 app.get('/health', (req, res) => {
     res.json({ status: 'ok' });
 });
+
+//flight data proxy route
+//fetched live aircraft data from adsb.lol and returns it to the client
+//keeping the thrid-party API URL server-side in case we need to add auth later
+app.get('/api/flights', async (req, res) => {
+    try {
+        const { lat = 39.5, lon = -98.35, dist = 2500 } = req.query
+
+        const response = await axios.get(
+            `https://api.adsb.lol/v2/lat/${lat}/lon/${lon}/dist/${dist}`
+        )
+
+        res.json(response.data)
+    }catch (error) {
+        console.error('Error fetching flight data:', error.message)
+        res.status(500).json({ error: 'Failed to fetch flight data' })
+    }
+})
 
 //start the server
 app.listen(PORT, () => {
