@@ -5,6 +5,7 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import ThreeGlobe from 'three-globe'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 function GlobeComponent() {
   const mountRef = useRef(null)
@@ -21,6 +22,7 @@ function GlobeComponent() {
     const renderer = new THREE.WebGLRenderer({ antialias: true })
 
     renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setPixelRatio(window.devicePixelRatio)
     container.appendChild(renderer.domElement)
 
     // Initialize the globe
@@ -29,20 +31,36 @@ function GlobeComponent() {
 
     scene.add(globe)
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
+    // Ambient Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 2.0)
     scene.add(ambientLight)
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8)
-    directionalLight.position.set(1, 1, 1)
+    
+    //directional light - simulates sunlight from one direction
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 2.0)
+    directionalLight.position.set(5, 3, 5)
     scene.add(directionalLight)
 
-    // Camera position
-    camera.position.z = 300
+    //secondary fill light - softens the dark side of the glass
+    const fillLight = new THREE.DirectionalLight(0x4488ff, 0.5)
+    fillLight.position.set(-5, -3, 5)
+    scene.add(fillLight)
+
+    //pull the camera back far enough to see the full globe
+    camera.position.z = 250
+
+    //OrbitControls - enables far enough to see the full globe
+    const controls = new OrbitControls(camera, renderer.domElement)
+    controls.enableDamping = true //Smoooth inertia on drag
+    controls.dampingFactor = 0.05 
+    controls.minDistance = 150 //prevent zooming inside the globe
+    controls.maxDistance = 500 //prevents zooming too far out
+
+
 
     // Animation loop
     const animate = () => {
       requestAnimationFrame(animate)
-      globe.rotation.y += 0.001
+      controls.update() //required for damping to work
       renderer.render(scene, camera)
     }
     animate()
