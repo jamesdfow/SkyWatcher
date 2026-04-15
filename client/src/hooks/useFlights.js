@@ -5,14 +5,15 @@ import { useEffect } from "react";
 import { useQuery } from '@tanstack/react-query'
 import { fetchFlights } from "../services/flightService";
 import useGlobeStore from "../store/globeStore";
-import { use } from "react";
 
 const useFlights = (lat, lon, dist) => {
     const setFlights = useGlobeStore((state) => state.setFlights)
+    
+    const queryFn = () => fetchFlights(lat, lon, dist)
 
     const { data, isLoading, isError } = useQuery({
         queryKey: ['flights', lat, lon, dist],
-        queryFN: () => fetchFlights(lat, lon, dist),
+        queryFn, 
         refetchInterval: 10000, //poll every 10 seconds
         staleTime: 5000,        //Consider data fresh for 5 seconds
     })
