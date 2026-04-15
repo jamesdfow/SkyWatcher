@@ -1,9 +1,11 @@
 //Root application component
 
+import Globe from './components/Globe'
+
 function App() {
   return (
-    <div>
-    <h1>SkyWatcher</h1>
+    <div className="w-screen h-screen overflow-hidden bg-black">
+      <Globe />
     </div>
   )
 }
