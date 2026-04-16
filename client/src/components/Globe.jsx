@@ -13,6 +13,7 @@ function GlobeComponent() {
   const mountRef = useRef(null)
   const globeInstanceRef = useRef(null)
   const cameraRef = useRef(null)
+  const rendererRef = useRef(null)
 
   //track current center of the view as lat/lon
   const [viewCenter, setViewCenter] = useState({ lat: 39.5, lon: -98.35 })
@@ -23,6 +24,9 @@ function GlobeComponent() {
 
   // subscribe to the flights array from Zustand
   const flights = useGlobeStore((state) => state.flights)
+  const selectedFlight = useGlobeStore((state) => state.selectedFlight)
+  const isFlightSelected = useGlobeStore((state) => state.isFlightSelected)
+  const setSelectedFlight = useGlobeStore((state) => state.setSelectedFlight)
 
   //initialize the globe once on mount
   useEffect(() => {
@@ -48,8 +52,8 @@ function GlobeComponent() {
 
     //store glove instance so we can update data layers separately
     globeInstanceRef.current = globe
-
     cameraRef.current = camera
+    rendererRef.current = renderer
 
     // Ambient Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 2.0)
@@ -72,7 +76,7 @@ function GlobeComponent() {
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true //Smoooth inertia on drag
     controls.dampingFactor = 0.05 
-    controls.minDistance = 150 //prevent zooming inside the globe
+    controls.minDistance = 10 //prevent zooming inside the globe
     controls.maxDistance = 500 //prevents zooming too far out
     
     //when the user stops draggins, calculate the new center lat/lon
@@ -126,25 +130,81 @@ controls.addEventListener('end', () => {
     }
   }, [])
 
-  //Update flight points on the globe whenever the flights array changes
-  useEffect(() => {
-    if (!globeInstanceRef.current || flights.length === 0) return
+  // Update flight points whenever flights or selection state changes
+useEffect(() => {
+  if (!globeInstanceRef.current) return
 
-    // filter out aircraft with no position data
-    const validFlights = flights.filter(
-      (f) => f.lat != null && f.lon != null
+  const validFlights = flights.filter((f) => f.lat != null && f.lon != null)
+
+  // If a flight is selected, only show that one — hide all others
+  const displayFlights = isFlightSelected && selectedFlight
+    ? validFlights.filter((f) => f.hex === selectedFlight.hex)
+    : validFlights
+
+  globeInstanceRef.current
+    .pointsData(displayFlights)
+    .pointLat((f) => f.lat)
+    .pointLng((f) => f.lon)
+    .pointAltitude(0)
+    .pointRadius(isFlightSelected ? 0.4 : 0.15)
+    .pointColor(() => '#00ff88')
+}, [flights, selectedFlight, isFlightSelected])
+
+// Handle click events on the globe canvas
+// Raycasts from the mouse position to find which aircraft was clicked
+useEffect(() => {
+  if (!mountRef.current || !globeInstanceRef.current) return
+
+  const handleClick = (event) => {
+    const camera = cameraRef.current
+    const renderer = rendererRef.current
+    if (!camera || !renderer) return
+
+    // Convert mouse position to normalized device coordinates (-1 to +1)
+    const rect = renderer.domElement.getBoundingClientRect()
+    const mouse = new THREE.Vector2(
+      ((event.clientX - rect.left) / rect.width) * 2 - 1,
+      -((event.clientY - rect.top) / rect.height) * 2 + 1
     )
 
-    //render aircraft as points on the globe surface
-    globeInstanceRef.current
-      .pointsData(validFlights)
-      .pointLat((f) => f.lat)
-      .pointLng((f) => f.lon)
-      .pointAltitude(0)
-      .pointRadius(0.11)
-      .pointColor(() => '#c1f441')
-  }, [flights])
+    const raycaster = new THREE.Raycaster()
+    raycaster.setFromCamera(mouse, camera)
+    raycaster.params.Points.threshold = 1.5
 
+    // Check intersections against the globe's point objects
+    const intersects = raycaster.intersectObjects(
+      globeInstanceRef.current.children,
+      true
+    )
+
+    if (intersects.length > 0) {
+      // Find the closest valid flight to the click point
+      const point = intersects[0].point
+      const GLOBE_RADIUS = 100
+      const clickLat = Math.asin(point.y / GLOBE_RADIUS) * (180 / Math.PI)
+      const clickLon = Math.atan2(point.x, point.z) * (180 / Math.PI)
+
+      // Find the nearest flight to where the user clicked
+      const nearest = flights
+        .filter((f) => f.lat != null && f.lon != null)
+        .reduce((closest, flight) => {
+          const dist = Math.hypot(flight.lat - clickLat, flight.lon - clickLon)
+          return dist < closest.dist ? { flight, dist } : closest
+        }, { flight: null, dist: Infinity })
+
+      if (nearest.flight && nearest.dist < 5) {
+        setSelectedFlight(nearest.flight)
+      }
+    }
+  }
+
+  const canvas = rendererRef.current?.domElement
+  canvas?.addEventListener('click', handleClick)
+
+  return () => {
+    canvas?.removeEventListener('click', handleClick)
+  }
+}, [flights, setSelectedFlight])
   return (
     <div
       ref={mountRef}

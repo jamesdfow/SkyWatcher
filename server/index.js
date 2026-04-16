@@ -51,6 +51,35 @@ app.get('/api/flights', async (req, res) => {
     }
 })
 
+//flight detail proxy route
+//fetches detailed infor for a specific aircraft by ICAO hex code
+//adsb.lol returns route infor including origin/destination airports
+app.get('/api/flights/detail/:icao', async (req, res) => {
+    try {
+        const { icao } = req.params
+        res.json(response.data)
+    } catch (error) {
+        console.error('Error fetching flight detail:', error.message)
+        res.status(500).json({ error: 'Failed to fetch flight detail' })
+    }
+})
+
+//route lookup proxy
+//uses the callsign to fetch origin/destination from adsb.lol
+//not all flights will have route data
+app.get('/api/flights/route/:callsign', async (req, res) => {
+    try {
+        const { callsign } = req.params
+        const response = await axios.get(
+            `https://api.adsb.lol/v2/callsign/${callsign.trim()}`
+        )
+        res.json(response.data)
+        } catch (error) {
+            console.error('Error fetching route:', error.message)
+            res.status(500).json({ error: 'Failed to fetch route data' })
+        }
+    })
+
 //start the server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
