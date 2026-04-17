@@ -32,10 +32,12 @@ useEffect(() => {
       }
     }
 
-    if (selectedFlight.reg) {
+    const registration = selectedFlight.reg || selectedFlight.r
+
+    if (registration) {
       try {
         const res = await axios.get(
-          `${API_BASE_URL}/api/photos/${selectedFlight.reg}`
+          `${API_BASE_URL}/api/photos/${registration}`
         )
         const photo = res.data?.photos?.[0]
         setPhotoData(photo || null)
@@ -69,26 +71,29 @@ useEffect(() => {
   const dest = routeData?.dest_iata || routeData?.dest_icao || '???'
 
   return (
-    <a>
-    href={photoData?.link}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="block relative"
-  </a>
-      <img
-        src={photoData.thumbnail_large?.src || photoData.thumbnail?.src}
-        alt={`${flight?.trim() || reg} aircraft`}
-        className="w-full h-40 object-cover"
-      />
-      <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-xs text-gray-300">
-        Photo: {photoData.photographer} via{' '}
-        <span className="text-green-400">Planespotters.net</span>
-      </div>
-    </>
-  )}
-</a>
-    
-    <div className="absolute top-6 right-6 w-80 bg-black/80 border border-green-500/30 rounded-lg p-5 text-white backdrop-blur-sm z-10">
+    <div className="absolute top-6 right-6 w-80 bg-black/80 border border-green-500/30 rounded-lg overflow-hidden text-white backdrop-blur-sm z-10">
+
+      {/* Aircraft photo */}
+      {photoData && (
+        <a
+          href={photoData?.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block relative"
+        >
+          <img
+            src={photoData.thumbnail_large?.src || photoData.thumbnail?.src}
+            alt={`${flight?.trim() || reg} aircraft`}
+            className="w-full h-40 object-cover"
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-xs text-gray-300">
+            Photo: {photoData.photographer} via{' '}
+            <span className="text-green-400">Planespotters.net</span>
+          </div>
+        </a>
+      )}
+
+      <div className="p-5">
       
       {/* Header */}
       <div className="flex justify-between items-start mb-4">
@@ -156,6 +161,7 @@ useEffect(() => {
       <div className="mt-3 text-gray-500 text-xs text-center font-mono">
         {lat?.toFixed(4)}° / {lon?.toFixed(4)}°
       </div>
+    </div>
     </div>
   )
 }
