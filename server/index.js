@@ -67,11 +67,11 @@ app.get('/api/flights/detail/:icao', async (req, res) => {
 //route lookup proxy
 //uses the callsign to fetch origin/destination from adsb.lol
 //not all flights will have route data
-app.get('/api/flights/route/:callsign', async (req, res) => {
+app.get('/api/route/:callsign', async (req, res) => {
     try {
         const { callsign } = req.params
         const response = await axios.get(
-            `https://api.adsb.lol/v2/callsign/${callsign.trim()}`
+            `https://api.adsbdb.com/v0/callsign/${callsign.trim()}`
         )
         res.json(response.data)
         } catch (error) {
@@ -79,6 +79,21 @@ app.get('/api/flights/route/:callsign', async (req, res) => {
             res.status(500).json({ error: 'Failed to fetch route data' })
         }
     })
+
+//airport lookup proxy
+//fetches airport coords by ICAO code from static Github API
+app.get('/api/airports/:icao', async (req, res) => {
+    try {
+        const { icao } = req.params
+        const response = await axios.get(
+            `https://ryanburnette.github.io/airports-api/icao/${icao.toLowerCase()}.json`
+        )
+        res.json(response.data)
+    } catch (error) {
+        console.error('Error fetching airport:', error.message)
+        res.status(500).json({ error: 'Failed to fetch airport data' })
+    }
+})
 
     //plaespotters photo proxy route
     //fetches aircraft photos by registration number
