@@ -25,11 +25,11 @@ useEffect(() => {
         const res = await axios.get(
           `${API_BASE_URL}/api/route/${selectedFlight.flight.trim()}`
         )
-        const flightRoute = res.data?.response?.flightRoute
+        const flightroute = res.data?.response?.flightroute
         console.log('res.data:', res.data)
         console.log('res.data.response:', res.data?.response)
         console.log('res.data.response.flightroute:', res.data?.response?.flightroute)
-        setRouteData(flightRoute || null)
+        setRouteData(flightroute || null)
       } catch {
         setRouteData(null)
       }
