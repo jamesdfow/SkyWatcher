@@ -12,18 +12,19 @@ function FlightCard() {
   const selectedFlight = useGlobeStore((state) => state.selectedFlight)
   const clearSelectedFlight = useGlobeStore((state) => state.clearSelectedFlight)
   const [routeData, setRouteData] = useState(null)
+  const [photoData, setPhotoData] = useState(null)
 
   // When a flight is selected, fetch its route data by callsign
-  useEffect(() => {
-    if (!selectedFlight?.flight) return
+// When a flight is selected, fetch route and photo data
+useEffect(() => {
+  if (!selectedFlight) return
 
-    const callsign = selectedFlight.flight.trim()
-    if (!callsign) return
-
-    const fetchRoute = async () => {
+  const fetchData = async () => {
+    if (selectedFlight.flight?.trim()) {
       try {
-        const res = await axios.get(`${API_BASE_URL}/api/flights/route/${callsign}`)
-        console.log('Route response:', res.data)
+        const res = await axios.get(
+          `${API_BASE_URL}/api/flights/route/${selectedFlight.flight.trim()}`
+        )
         const aircraft = res.data?.ac?.[0]
         setRouteData(aircraft || null)
       } catch {
@@ -31,8 +32,23 @@ function FlightCard() {
       }
     }
 
-    fetchRoute()
-  }, [selectedFlight])
+    const registration = selectedFlight.reg || selectedFlight.r
+
+    if (registration) {
+      try {
+        const res = await axios.get(
+          `${API_BASE_URL}/api/photos/${registration}`
+        )
+        const photo = res.data?.photos?.[0]
+        setPhotoData(photo || null)
+      } catch {
+        setPhotoData(null)
+      }
+    }
+  }
+
+  fetchData()
+}, [selectedFlight])
 
   if (!selectedFlight) return null
 
@@ -55,7 +71,29 @@ function FlightCard() {
   const dest = routeData?.dest_iata || routeData?.dest_icao || '???'
 
   return (
-    <div className="absolute top-6 right-6 w-80 bg-black/80 border border-green-500/30 rounded-lg p-5 text-white backdrop-blur-sm z-10">
+    <div className="absolute top-6 right-6 w-80 bg-black/80 border border-green-500/30 rounded-lg overflow-hidden text-white backdrop-blur-sm z-10">
+
+      {/* Aircraft photo */}
+      {photoData && (
+        <a
+          href={photoData?.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block relative"
+        >
+          <img
+            src={photoData.thumbnail_large?.src || photoData.thumbnail?.src}
+            alt={`${flight?.trim() || reg} aircraft`}
+            className="w-full h-40 object-cover"
+          />
+          <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 text-xs text-gray-300">
+            Photo: {photoData.photographer} via{' '}
+            <span className="text-green-400">Planespotters.net</span>
+          </div>
+        </a>
+      )}
+
+      <div className="p-5">
       
       {/* Header */}
       <div className="flex justify-between items-start mb-4">
@@ -73,7 +111,7 @@ function FlightCard() {
         </button>
       </div>
 
-Route
+{/*Route*/}
 <div className="flex items-center justify-between mb-4 bg-white/5 rounded p-3">
   <div className="text-center">
     <p className="text-green-400 text-lg font-mono font-bold">{orig}</p>
@@ -123,6 +161,7 @@ Route
       <div className="mt-3 text-gray-500 text-xs text-center font-mono">
         {lat?.toFixed(4)}° / {lon?.toFixed(4)}°
       </div>
+    </div>
     </div>
   )
 }

@@ -80,6 +80,22 @@ app.get('/api/flights/route/:callsign', async (req, res) => {
         }
     })
 
+    //plaespotters photo proxy route
+    //fetches aircraft photos by registration number
+    //photos cannot be cacheed
+    app.get('/api/photos/:reg', async (req, res) => {
+        try {
+            const { reg } = req.params
+            const response = await axios.get(
+                `https://api.planespotters.net/pub/photos/reg/${reg}`
+            )
+            res.json(response.data)
+        } catch (error) {
+            console.error('Error fetching photo:', error.message)
+            res.status(500).json({ error: 'Failed to fetch photo' })
+        }
+    })
+
 //start the server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
