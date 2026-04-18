@@ -25,8 +25,11 @@ const useGlobeStore = create((set) => ({
     //clear the selected flight
     clearSelectedFlight: () => set({ 
         selectedFlight: null,
-        isFlightSelected: false
+        isFlightSelected: false,
+        setRouteData: (data) => set({ routeData: data }),
+        routeData: null
      }),
+
 }))
 
 export default useGlobeStore
