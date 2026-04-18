@@ -26,9 +26,6 @@ useEffect(() => {
           `${API_BASE_URL}/api/route/${selectedFlight.flight.trim()}`
         )
         const flightroute = res.data?.response?.flightroute
-        console.log('res.data:', res.data)
-        console.log('res.data.response:', res.data?.response)
-        console.log('res.data.response.flightroute:', res.data?.response?.flightroute)
         setRouteData(flightroute || null)
       } catch {
         setRouteData(null)
@@ -72,6 +69,7 @@ useEffect(() => {
   // Use route data for origin/destination if available
   const orig = routeData?.origin?.iata_code || routeData?.origin?.icao_code || '???'
   const dest = routeData?.destination?.iata_code || routeData?.destination?.icao_code || '???'
+
   return (
     <div className="absolute top-6 right-6 w-80 bg-black/80 border border-green-500/30 rounded-lg overflow-hidden text-white backdrop-blur-sm z-10">
 

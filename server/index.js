@@ -80,8 +80,6 @@ app.get('/api/route/:callsign', async (req, res) => {
         }
     })
 
-//airport lookup proxy
-//fetches airport coords by ICAO code from static Github API
 app.get('/api/airports/:icao', async (req, res) => {
     try {
         const { icao } = req.params
