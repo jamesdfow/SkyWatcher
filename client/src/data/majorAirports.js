@@ -1,0 +1,118 @@
+// majorAirports.js
+// Static dataset of ~100 major world airports
+// Used to display airport labels on the globe
+// Sources: OAG Busiest Airports 2024, ACI World rankings
+
+const majorAirports = [
+  // North America
+  { iata: "ATL", name: "Hartsfield-Jackson Atlanta Intl", lat: 33.6407, lng: -84.4277 },
+  { iata: "DFW", name: "Dallas/Fort Worth Intl", lat: 32.8998, lng: -97.0403 },
+  { iata: "DEN", name: "Denver Intl", lat: 39.8561, lng: -104.6737 },
+  { iata: "ORD", name: "O'Hare Intl", lat: 41.9742, lng: -87.9073 },
+  { iata: "LAX", name: "Los Angeles Intl", lat: 33.9425, lng: -118.4081 },
+  { iata: "JFK", name: "John F. Kennedy Intl", lat: 40.6413, lng: -73.7781 },
+  { iata: "SFO", name: "San Francisco Intl", lat: 37.6213, lng: -122.3790 },
+  { iata: "SEA", name: "Seattle-Tacoma Intl", lat: 47.4502, lng: -122.3088 },
+  { iata: "MIA", name: "Miami Intl", lat: 25.7959, lng: -80.2870 },
+  { iata: "CLT", name: "Charlotte Douglas Intl", lat: 35.2140, lng: -80.9431 },
+  { iata: "EWR", name: "Newark Liberty Intl", lat: 40.6895, lng: -74.1745 },
+  { iata: "MCO", name: "Orlando Intl", lat: 28.4312, lng: -81.3081 },
+  { iata: "PHX", name: "Phoenix Sky Harbor Intl", lat: 33.4373, lng: -112.0078 },
+  { iata: "IAH", name: "George Bush Intercontinental", lat: 29.9902, lng: -95.3368 },
+  { iata: "BOS", name: "Logan Intl", lat: 42.3656, lng: -71.0096 },
+  { iata: "MSP", name: "Minneapolis-St Paul Intl", lat: 44.8848, lng: -93.2223 },
+  { iata: "DTW", name: "Detroit Metropolitan", lat: 42.2124, lng: -83.3534 },
+  { iata: "LAS", name: "Harry Reid Intl", lat: 36.0840, lng: -115.1537 },
+  { iata: "FLL", name: "Fort Lauderdale-Hollywood Intl", lat: 26.0742, lng: -80.1506 },
+  { iata: "PHL", name: "Philadelphia Intl", lat: 39.8744, lng: -75.2424 },
+  { iata: "BWI", name: "Baltimore/Washington Intl", lat: 39.1754, lng: -76.6683 },
+  { iata: "SLC", name: "Salt Lake City Intl", lat: 40.7899, lng: -111.9791 },
+  { iata: "DCA", name: "Ronald Reagan Washington National", lat: 38.8512, lng: -77.0402 },
+  { iata: "IAD", name: "Washington Dulles Intl", lat: 38.9531, lng: -77.4565 },
+  { iata: "YYZ", name: "Toronto Pearson Intl", lat: 43.6777, lng: -79.6248 },
+  { iata: "YVR", name: "Vancouver Intl", lat: 49.1967, lng: -123.1815 },
+  { iata: "YUL", name: "Montréal-Trudeau Intl", lat: 45.4706, lng: -73.7408 },
+  { iata: "MEX", name: "Mexico City Intl", lat: 19.4363, lng: -99.0721 },
+  { iata: "CUN", name: "Cancún Intl", lat: 21.0365, lng: -86.8771 },
+
+  // South America
+  { iata: "GRU", name: "São Paulo-Guarulhos Intl", lat: -23.4356, lng: -46.4731 },
+  { iata: "BOG", name: "El Dorado Intl", lat: 4.7016, lng: -74.1469 },
+  { iata: "SCL", name: "Santiago Intl", lat: -33.3930, lng: -70.7858 },
+  { iata: "EZE", name: "Buenos Aires Ezeiza Intl", lat: -34.8222, lng: -58.5358 },
+  { iata: "LIM", name: "Jorge Chávez Intl", lat: -12.0219, lng: -77.1143 },
+  { iata: "GIG", name: "Rio de Janeiro-Galeão Intl", lat: -22.8100, lng: -43.2506 },
+
+  // Europe
+  { iata: "LHR", name: "London Heathrow", lat: 51.4700, lng: -0.4543 },
+  { iata: "CDG", name: "Paris Charles de Gaulle", lat: 49.0097, lng: 2.5479 },
+  { iata: "IST", name: "Istanbul Airport", lat: 41.2753, lng: 28.7519 },
+  { iata: "AMS", name: "Amsterdam Schiphol", lat: 52.3105, lng: 4.7683 },
+  { iata: "FRA", name: "Frankfurt Airport", lat: 50.0379, lng: 8.5622 },
+  { iata: "MAD", name: "Adolfo Suárez Madrid-Barajas", lat: 40.4983, lng: -3.5676 },
+  { iata: "BCN", name: "Barcelona-El Prat", lat: 41.2974, lng: 2.0833 },
+  { iata: "FCO", name: "Rome Fiumicino", lat: 41.8003, lng: 12.2389 },
+  { iata: "LGW", name: "London Gatwick", lat: 51.1537, lng: -0.1821 },
+  { iata: "MUC", name: "Munich Airport", lat: 48.3538, lng: 11.7861 },
+  { iata: "ZRH", name: "Zurich Airport", lat: 47.4647, lng: 8.5492 },
+  { iata: "CPH", name: "Copenhagen Airport", lat: 55.6180, lng: 12.6508 },
+  { iata: "OSL", name: "Oslo Gardermoen", lat: 60.1976, lng: 11.1004 },
+  { iata: "ARN", name: "Stockholm Arlanda", lat: 59.6519, lng: 17.9186 },
+  { iata: "HEL", name: "Helsinki-Vantaa", lat: 60.3172, lng: 24.9633 },
+  { iata: "VIE", name: "Vienna Intl", lat: 48.1103, lng: 16.5697 },
+  { iata: "DUB", name: "Dublin Airport", lat: 53.4264, lng: -6.2499 },
+  { iata: "LIS", name: "Lisbon Humberto Delgado", lat: 38.7756, lng: -9.1354 },
+  { iata: "ATH", name: "Athens Intl", lat: 37.9364, lng: 23.9445 },
+  { iata: "WAW", name: "Warsaw Chopin", lat: 52.1657, lng: 20.9671 },
+  { iata: "SVO", name: "Moscow Sheremetyevo", lat: 55.9726, lng: 37.4146 },
+
+  // Middle East
+  { iata: "DXB", name: "Dubai Intl", lat: 25.2532, lng: 55.3657 },
+  { iata: "DOH", name: "Hamad Intl", lat: 25.2731, lng: 51.6081 },
+  { iata: "AUH", name: "Abu Dhabi Intl", lat: 24.4330, lng: 54.6511 },
+  { iata: "JED", name: "King Abdulaziz Intl", lat: 21.6796, lng: 39.1565 },
+  { iata: "RUH", name: "King Khalid Intl", lat: 24.9578, lng: 46.6989 },
+  { iata: "TLV", name: "Ben Gurion Intl", lat: 32.0055, lng: 34.8854 },
+
+  // Asia
+  { iata: "HND", name: "Tokyo Haneda", lat: 35.5494, lng: 139.7798 },
+  { iata: "NRT", name: "Tokyo Narita", lat: 35.7720, lng: 140.3929 },
+  { iata: "PEK", name: "Beijing Capital Intl", lat: 40.0799, lng: 116.6031 },
+  { iata: "PVG", name: "Shanghai Pudong Intl", lat: 31.1443, lng: 121.8083 },
+  { iata: "CAN", name: "Guangzhou Baiyun Intl", lat: 23.3924, lng: 113.2988 },
+  { iata: "HKG", name: "Hong Kong Intl", lat: 22.3080, lng: 113.9185 },
+  { iata: "ICN", name: "Seoul Incheon Intl", lat: 37.4602, lng: 126.4407 },
+  { iata: "SIN", name: "Singapore Changi", lat: 1.3644, lng: 103.9915 },
+  { iata: "BKK", name: "Bangkok Suvarnabhumi", lat: 13.6900, lng: 100.7501 },
+  { iata: "KUL", name: "Kuala Lumpur Intl", lat: 2.7456, lng: 101.7099 },
+  { iata: "DEL", name: "Indira Gandhi Intl", lat: 28.5562, lng: 77.1000 },
+  { iata: "BOM", name: "Chhatrapati Shivaji Maharaj Intl", lat: 19.0896, lng: 72.8656 },
+  { iata: "BLR", name: "Kempegowda Intl", lat: 13.1979, lng: 77.7063 },
+  { iata: "CGK", name: "Jakarta Soekarno-Hatta Intl", lat: -6.1256, lng: 106.6559 },
+  { iata: "MNL", name: "Manila Ninoy Aquino Intl", lat: 14.5086, lng: 121.0198 },
+  { iata: "TPE", name: "Taiwan Taoyuan Intl", lat: 25.0797, lng: 121.2342 },
+  { iata: "CTU", name: "Chengdu Tianfu Intl", lat: 30.3145, lng: 104.4412 },
+  { iata: "SZX", name: "Shenzhen Bao'an Intl", lat: 22.6393, lng: 113.8107 },
+  { iata: "KIX", name: "Osaka Kansai Intl", lat: 34.4347, lng: 135.2441 },
+  { iata: "HAN", name: "Hanoi Noi Bai Intl", lat: 21.2212, lng: 105.8070 },
+  { iata: "SGN", name: "Ho Chi Minh City Tan Son Nhat", lat: 10.8185, lng: 106.6519 },
+
+  // Africa
+  { iata: "JNB", name: "Johannesburg O.R. Tambo Intl", lat: -26.1392, lng: 28.2460 },
+  { iata: "CPT", name: "Cape Town Intl", lat: -33.9649, lng: 18.6017 },
+  { iata: "CAI", name: "Cairo Intl", lat: 30.1219, lng: 31.4056 },
+  { iata: "ADD", name: "Addis Ababa Bole Intl", lat: 8.9779, lng: 38.7993 },
+  { iata: "NBO", name: "Jomo Kenyatta Intl", lat: -1.3192, lng: 36.9278 },
+  { iata: "CMN", name: "Casablanca Mohammed V Intl", lat: 33.3675, lng: -7.5898 },
+  { iata: "LOS", name: "Lagos Murtala Muhammed Intl", lat: 6.5774, lng: 3.3212 },
+  { iata: "ALG", name: "Algiers Houari Boumediene", lat: 36.6910, lng: 3.2155 },
+
+  // Oceania
+  { iata: "SYD", name: "Sydney Kingsford Smith", lat: -33.9461, lng: 151.1772 },
+  { iata: "MEL", name: "Melbourne Airport", lat: -37.6690, lng: 144.8410 },
+  { iata: "BNE", name: "Brisbane Airport", lat: -27.3842, lng: 153.1175 },
+  { iata: "AKL", name: "Auckland Airport", lat: -37.0082, lng: 174.7850 },
+  { iata: "PER", name: "Perth Airport", lat: -31.9403, lng: 115.9672 },
+]
+
+export default majorAirports
