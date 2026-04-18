@@ -8,6 +8,7 @@ import ThreeGlobe from 'three-globe'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import useFlights from '../hooks/useFlights'
 import useGlobeStore from '../store/globeStore'
+import majorAirports from '../data/majorAirports'
 
 function GlobeComponent() {
   const mountRef = useRef(null)
@@ -131,7 +132,10 @@ function GlobeComponent() {
   useEffect(() => {
     if (!globeInstanceRef.current) return
 
-    const validFlights = flights.filter((f) => f.lat != null && f.lon != null)
+  const commercialCategories = ['A2', 'A3', 'A4', 'A5']
+  const validFlights = flights.filter((f) => 
+    f.lat != null && f.lon != null && commercialCategories.includes(f.category)
+  )
 
     // If a flight is selected, only show that one — hide all others
     const displayFlights = isFlightSelected && selectedFlight
@@ -266,6 +270,21 @@ useEffect(() => {
   controls.target.set(0, 0, 0)
   controls.update()
   }, [routeData])
+
+  // Display major airport labels on the globe
+useEffect(() => {
+  if (!globeInstanceRef.current) return
+
+  globeInstanceRef.current
+    .labelsData(majorAirports)
+    .labelLat((d) => d.lat)
+    .labelLng((d) => d.lng)
+    .labelText((d) => `${d.iata}`)
+    .labelSize(0.3)
+    .labelDotRadius(0.1)
+    .labelColor(() => 'rgba(255, 255, 255, 0.7)')
+    .labelResolution(2)
+}, [])
 
   return (
     <div
