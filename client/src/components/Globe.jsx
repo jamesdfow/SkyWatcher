@@ -15,6 +15,7 @@ function GlobeComponent() {
   const cameraRef = useRef(null)
   const rendererRef = useRef(null)
   const zoomLevelRef = useRef(250)
+  const controlsRef = useRef(null)
 
   // Track current center of the view as lat/lon
   const [viewCenter, setViewCenter] = useState({ lat: 39.5, lon: -98.35 })
@@ -29,6 +30,7 @@ function GlobeComponent() {
   const isFlightSelected = useGlobeStore((state) => state.isFlightSelected)
   const setSelectedFlight = useGlobeStore((state) => state.setSelectedFlight)
   const clearSelectedFlight = useGlobeStore((state) => state.clearSelectedFlight)
+  const routeData = useGlobeStore((state) => state.routeData)
 
   // Initialize the globe once on mount
   useEffect(() => {
@@ -77,6 +79,8 @@ function GlobeComponent() {
     controls.dampingFactor = 1.5
     controls.minDistance = 100
     controls.maxDistance = 500
+
+    controlsRef.current = controls
 
     controls.addEventListener('change', () => {
       zoomLevelRef.current = camera.position.length()
@@ -157,7 +161,7 @@ function GlobeComponent() {
   // Raycasts from the mouse position to find which aircraft was clicked
   useEffect(() => {
     if (!mountRef.current || !globeInstanceRef.current) return
-
+    
     const handleClick = (event) => {
       const camera = cameraRef.current
       const renderer = rendererRef.current
@@ -165,8 +169,7 @@ function GlobeComponent() {
 
       // If a flight is already selected, any click deselects and restores all traffic
       if (isFlightSelected) {
-        clearSelectedFlight()
-        return
+          return
       }
 
       // Convert mouse position to normalized device coordinates (-1 to +1)
@@ -211,6 +214,58 @@ function GlobeComponent() {
       canvas?.removeEventListener('click', handleClick)
     }
   }, [flights, isFlightSelected, setSelectedFlight, clearSelectedFlight])
+
+  useEffect(() => {
+    if (!globeInstanceRef.current) return
+
+    if (routeData?.origin && routeData?.destination) {
+      const arcData = [{
+        startLat: routeData.origin.latitude,
+        startLng: routeData.origin.longitude,
+        endLat: routeData.destination.latitude,
+        endLng: routeData.destination.longitude,
+      }]
+
+      globeInstanceRef.current
+        .arcsData(arcData)
+        .arcColor(() => '#ff4444')
+        .arcDashLength(0.5)
+        .arcDashGap(0.2)
+        .arcDashAnimateTime(2000)
+        .arcStroke(0.15)
+        .arcAltitude(0.02)
+    } else {
+      globeInstanceRef.current.arcsData([])
+    }
+  }, [routeData])
+
+  // Auto-rotate globe to frame the route when a flight is selected
+useEffect(() => {
+  console.log('Camera effect - routeData:', routeData)
+
+  if (!routeData?.origin || !routeData?.destination) return
+  if (!globeInstanceRef.current || !cameraRef.current || !controlsRef.current) return
+
+  const midLat = (routeData.origin.latitude + routeData.destination.latitude) / 2
+  const midLng = (routeData.origin.longitude + routeData.destination.longitude) / 2
+
+  const dist = Math.hypot(
+  routeData.destination.latitude - routeData.origin.latitude,
+  routeData.destination.longitude - routeData.origin.longitude
+  )
+  const cameraDistance = Math.min(Math.max(dist * 2, 150), 300)
+
+  const { x, y, z } = globeInstanceRef.current.getCoords(midLat, midLng, 0)
+  const direction = new THREE.Vector3(x, y, z).normalize()
+  const cameraTarget = direction.multiplyScalar(cameraDistance)
+
+  const camera = cameraRef.current
+  const controls = controlsRef.current
+
+  camera.position.set(cameraTarget.x, cameraTarget.y, cameraTarget.z)
+  controls.target.set(0, 0, 0)
+  controls.update()
+  }, [routeData])
 
   return (
     <div

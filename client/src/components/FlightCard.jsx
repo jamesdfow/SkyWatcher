@@ -11,7 +11,8 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 function FlightCard() {
   const selectedFlight = useGlobeStore((state) => state.selectedFlight)
   const clearSelectedFlight = useGlobeStore((state) => state.clearSelectedFlight)
-  const [routeData, setRouteData] = useState(null)
+  const routeData = useGlobeStore((state) => state.routeData)
+  const setRouteData = useGlobeStore((state) => state.setRouteData)
   const [photoData, setPhotoData] = useState(null)
 
   // When a flight is selected, fetch its route data by callsign
