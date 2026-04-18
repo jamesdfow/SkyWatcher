@@ -23,10 +23,10 @@ useEffect(() => {
     if (selectedFlight.flight?.trim()) {
       try {
         const res = await axios.get(
-          `${API_BASE_URL}/api/flights/route/${selectedFlight.flight.trim()}`
+          `${API_BASE_URL}/api/route/${selectedFlight.flight.trim()}`
         )
-        const aircraft = res.data?.ac?.[0]
-        setRouteData(aircraft || null)
+        const flightroute = res.data?.response?.flightroute
+        setRouteData(flightroute || null)
       } catch {
         setRouteData(null)
       }
@@ -67,8 +67,8 @@ useEffect(() => {
   } = selectedFlight
 
   // Use route data for origin/destination if available
-  const orig = routeData?.orig_iata || routeData?.orig_icao || '???'
-  const dest = routeData?.dest_iata || routeData?.dest_icao || '???'
+  const orig = routeData?.origin?.iata_code || routeData?.origin?.icao_code || '???'
+  const dest = routeData?.destination?.iata_code || routeData?.destination?.icao_code || '???'
 
   return (
     <div className="absolute top-6 right-6 w-80 bg-black/80 border border-green-500/30 rounded-lg overflow-hidden text-white backdrop-blur-sm z-10">
