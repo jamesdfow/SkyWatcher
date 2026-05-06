@@ -105,6 +105,14 @@ function GlobeComponent() {
       }
     })
 
+    controls.addEventListener('change', () => {
+      zoomLevelRef.current = camera.position.length()
+
+      //slow down rotation when zoomed in
+      const zoom = camera.position.length()
+      controls.rotateSpeed = Math.max(zoom / 500, 0.1)
+    })
+
     // Animation loop
     const animate = () => {
       requestAnimationFrame(animate)
@@ -129,44 +137,102 @@ function GlobeComponent() {
   }, [])
 
   // Update flight points whenever flights or selection state changes
-  useEffect(() => {
-    if (!globeInstanceRef.current) return
+// Update flight objects whenever flights or selection state changes
+useEffect(() => {
+  if (!globeInstanceRef.current) return
+  globeInstanceRef.current.pointsData([])
 
   const commercialCategories = ['A2', 'A3', 'A4', 'A5']
   const validFlights = flights.filter((f) => 
     f.lat != null && f.lon != null && commercialCategories.includes(f.category)
   )
 
-    // If a flight is selected, only show that one — hide all others
-    const displayFlights = isFlightSelected && selectedFlight
-      ? validFlights.filter((f) => f.hex === selectedFlight.hex)
-      : validFlights
+  let displayFlights
 
-    const getPointRadius = () => {
-      const zoom = zoomLevelRef.current
-      if (isFlightSelected) return 0.4
-      if (zoom < 130) return 0.05
-      if (zoom < 180) return 0.08
-      if (zoom < 250) return 0.12
-      return 0.15
-    }    
+  if (isFlightSelected && selectedFlight) {
+    displayFlights = validFlights.filter((f) => f.hex === selectedFlight.hex)
+  } else {
+    const zoom = zoomLevelRef.current
+    let maxFlights
+    if (zoom > 400) maxFlights = 50
+    else if (zoom > 300) maxFlights = 150
+    else if (zoom > 200) maxFlights = 500
+    else maxFlights = validFlights.length
 
+    displayFlights = validFlights.slice(0, maxFlights)
+  }
 
-    globeInstanceRef.current
-      .pointsData(displayFlights)
-      .pointLat((f) => f.lat)
-      .pointLng((f) => f.lon)
-      .pointAltitude(0)
-      .pointRadius(getPointRadius())
-      .pointColor(() => '#00ff88')
-  }, [flights, selectedFlight, isFlightSelected])
+  const getSize = () => {
+    const zoom = zoomLevelRef.current
+    if (isFlightSelected) return 0.6
+    if (zoom < 130) return 0.15
+    if (zoom < 180) return 0.2
+    if (zoom < 250) return 0.3
+    return 0.35
+  }
+
+  const size = getSize()
+
+  globeInstanceRef.current
+    .objectsData(displayFlights)
+    .objectLat((f) => f.lat)
+    .objectLng((f) => f.lon)
+    .objectAltitude(0)
+    .objectRotation((f) => {
+      const heading = f.track || 0
+      return { x: 0, y: 0, z: -heading }
+    })
+    .objectThreeObject(() => {
+      // Create a plane shape
+      const shape = new THREE.Shape()
+      // Nose
+      shape.moveTo(0, 1)
+      // Right wing
+      shape.lineTo(0.6, -0.2)
+      shape.lineTo(0.15, -0.1)
+      // Tail right
+      shape.lineTo(0.15, -0.7)
+      shape.lineTo(0.35, -1)
+      // Tail bottom
+      shape.lineTo(0, -0.8)
+      // Tail left (mirror)
+      shape.lineTo(-0.35, -1)
+      shape.lineTo(-0.15, -0.7)
+      shape.lineTo(-0.15, -0.1)
+      // Left wing
+      shape.lineTo(-0.6, -0.2)
+      shape.closePath()
+
+      const geometry = new THREE.ShapeGeometry(shape)
+      geometry.scale(size, size, size)
+
+      const material = new THREE.MeshBasicMaterial({
+        color: 0x00ff88,
+        side: THREE.DoubleSide,
+      })
+
+      const mesh = new THREE.Mesh(geometry, material)
+      return mesh
+    })
+}, [flights, selectedFlight, isFlightSelected])
 
   // Handle click events on the globe canvas
   // Raycasts from the mouse position to find which aircraft was clicked
   useEffect(() => {
     if (!mountRef.current || !globeInstanceRef.current) return
     
+    let mouseDownPos = null
+
+    const handleMouseDown = (event) => {
+      mouseDownPos = { x: event.clientX, y: event.clientY }
+    }
+
     const handleClick = (event) => {
+      if (mouseDownPos) {
+        const dist = Math.hypot(event.clientX - mouseDownPos.x, event.clientY - mouseDownPos.y)
+        if (dist > 5) return
+      }
+
       const camera = cameraRef.current
       const renderer = rendererRef.current
       if (!camera || !renderer) return
@@ -212,9 +278,11 @@ function GlobeComponent() {
     }
 
     const canvas = rendererRef.current?.domElement
+    canvas?.addEventListener('mousedown', handleMouseDown)
     canvas?.addEventListener('click', handleClick)
 
     return () => {
+      canvas?.removeEventListener('mousedown', handleMouseDown)
       canvas?.removeEventListener('click', handleClick)
     }
   }, [flights, isFlightSelected, setSelectedFlight, clearSelectedFlight])
