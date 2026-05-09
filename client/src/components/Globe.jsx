@@ -136,7 +136,6 @@ function GlobeComponent() {
     }
   }, [])
 
-  // Update flight points whenever flights or selection state changes
 // Update flight objects whenever flights or selection state changes
 useEffect(() => {
   if (!globeInstanceRef.current) return
@@ -303,11 +302,43 @@ useEffect(() => {
         .arcColor(() => '#ff4444')
         .arcDashLength(0.5)
         .arcDashGap(0.2)
-        .arcDashAnimateTime(2000)
+        .arcDashAnimateTime(1000)
         .arcStroke(0.15)
-        .arcAltitude(0.02)
+        .arcAltitude(0.2)
+
+        // Add origin/dest labels alongside major airports
+      const routeAirports = [
+        {
+          lat: routeData.origin.latitude,
+          lng: routeData.origin.longitude,
+          iata: routeData.origin.iata_code,
+          isRoute: true,
+        },
+        {
+          lat: routeData.destination.latitude,
+          lng: routeData.destination.longitude,
+          iata: routeData.destination.iata_code,
+          isRoute: true,
+        },
+      ]
+      globeInstanceRef.current
+        .labelsData([...majorAirports, ...routeAirports])
+        .labelLat((d) => d.lat)
+        .labelLng((d) => d.lng)
+        .labelText((d) => d.isRoute ? `${d.iata}` : d.iata)
+        .labelSize((d) => d.isRoute ? 0.6 : 0.3)
+        .labelDotRadius((d) => d.isRoute ? 0.2 : 0.1)
+        .labelColor((d) => d.isRoute ? '#ff4444' : 'rgba(255, 255, 255, 0.7)')
+        .labelResolution(2)
     } else {
       globeInstanceRef.current.arcsData([])
+      //Reset labels back to just major airports
+      globeInstanceRef.current
+        .labelsData(majorAirports)
+        .labelText((d) => d.iata)
+        .labelSize(0.3)
+        .labelDotRadius(0.1)
+        .labelColor(() => 'rgba(255, 255, 255, 0.7)')
     }
   }, [routeData])
 
