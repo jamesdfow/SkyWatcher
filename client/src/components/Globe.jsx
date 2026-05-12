@@ -123,9 +123,11 @@ function GlobeComponent() {
 
     // Handle resize
     const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight
+      const width = container.clientWidth
+      const height = container.clientHeight
+      camera.aspect = width / height
       camera.updateProjectionMatrix()
-      renderer.setSize(window.innerWidth, window.innerHeight)
+      renderer.setSize(width, height)
     }
     window.addEventListener('resize', handleResize)
 
@@ -300,11 +302,11 @@ useEffect(() => {
       globeInstanceRef.current
         .arcsData(arcData)
         .arcColor(() => '#ff4444')
-        .arcDashLength(0.5)
-        .arcDashGap(0.2)
-        .arcDashAnimateTime(1000)
+        .arcDashLength(0.35)
+        .arcDashGap(0.1)
+        .arcDashAnimateTime(2000)
         .arcStroke(0.15)
-        .arcAltitude(0.2)
+        .arcAltitude(0.1)
 
         // Add origin/dest labels alongside major airports
       const routeAirports = [
@@ -388,7 +390,7 @@ useEffect(() => {
   return (
     <div
       ref={mountRef}
-      className="w-screen h-screen bg-black"
+      className="w-full h-full bg-black"
     />
   )
 }
