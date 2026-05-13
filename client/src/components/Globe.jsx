@@ -485,6 +485,34 @@ return (
       className="fixed z-50 pointer-events-none hidden bg-zinc-900/90 border border-zinc-700 rounded px-3 py-2 text-xs font-mono text-zinc-300 backdrop-blur-sm"
       style={{ display: 'none' }}
     />
+    <div className="absolute bottom-6 left-6 z-20 flex flex-col gap-2">
+      <button
+        onClick={() => {
+          if (!cameraRef.current || !controlsRef.current) return
+          const camera = cameraRef.current
+          const direction = camera.position.clone().normalize()
+          const newDistance = Math.max(camera.position.length() - 30, 100)
+          camera.position.copy(direction.multiplyScalar(newDistance))
+          controlsRef.current.update()
+        }}
+        className="w-10 h-10 bg-zinc-900/80 border border-zinc-700 rounded text-white text-lg font-mono hover:bg-zinc-800 transition-colors backdrop-blur-sm"
+      >
+        +
+      </button>
+      <button
+        onClick={() => {
+          if (!cameraRef.current || !controlsRef.current) return
+          const camera = cameraRef.current
+          const direction = camera.position.clone().normalize()
+          const newDistance = Math.min(camera.position.length() + 30, 500)
+          camera.position.copy(direction.multiplyScalar(newDistance))
+          controlsRef.current.update()
+        }}
+        className="w-10 h-10 bg-zinc-900/80 border border-zinc-700 rounded text-white text-lg font-mono hover:bg-zinc-800 transition-colors backdrop-blur-sm"
+      >
+        −
+      </button>
+    </div>
   </div>
 )
 }
