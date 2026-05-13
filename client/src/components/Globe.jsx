@@ -17,6 +17,8 @@ function GlobeComponent() {
   const rendererRef = useRef(null)
   const zoomLevelRef = useRef(250)
   const controlsRef = useRef(null)
+  const hoveredFlightRef = useRef(null)
+  const tooltipRef = useRef(null)
 
   // Track current center of the view as lat/lon
   const [viewCenter, setViewCenter] = useState({ lat: 39.5, lon: -98.35 })
@@ -371,6 +373,85 @@ useEffect(() => {
   controls.target.set(0, 0, 0)
   controls.update()
   }, [routeData])
+
+  //Handle hover events on the globe canvas
+
+  useEffect(() => {
+    if (!mountRef.current || !globeInstanceRef.current) return
+
+    const handleMouseMove = (event) => {
+      if (isFlightSelected) {
+        if(tooltipRef.current) tooltipRef.current.style.display = 'none'
+        hoveredFlightRef.current = null
+        return
+      }
+
+      const camera = cameraRef.current
+      const renderer = rendererRef.current
+      if (!camera || !renderer) return
+
+      const rect = renderer.domElement.getBoundingClientRect()
+      const mouse = new THREE.Vector2(
+        ((event.clientX - rect.left) / rect.width) * 2 - 1,
+        -((event.clientY - rect.top) / rect.height) * 2 + 1
+      )
+      const raycaster = new THREE.Raycaster()
+      raycaster.setFromCamera(mouse, camera)
+
+      const intersects = raycaster.intersectObjects(
+        globeInstanceRef.current.children,
+        true
+      )
+
+      if (intersects.length > 0) {
+        const point = intersects[0].point
+        const GLOBE_RADIUS = 100
+        const hoverLat = Math.asin(point.y / GLOBE_RADIUS) * (180 / Math.PI)
+        const hoverLon = Math.atan2(point.x, point.z) * (180 / Math.PI)
+
+        const nearest = flights
+          .filter((f) => f.lat != null && f.lon != null)
+          .reduce((closest, flight) => {
+            const dist = Math.hypot(flight.lat - hoverLat, flight.lon - hoverLon)
+            return dist < closest.dist ? { flight, dist } : closest
+          }, { flight: null, dist: Infinity })
+        
+        if (nearest.flight && nearest.dist < 3) {
+          hoveredFlightRef.current = nearest.flight
+
+        if (tooltipRef.current) {
+          const f = nearest.flight
+          const callsign = f.flight?.trim() || 'Unknown'
+          const type = f.desc || f.t || 'Unknown'
+          const heading = f.track != null ? `${Math.round(f.track)}°` : 'N/A'
+
+          tooltipRef.current.innerHTML = `
+            <div style="font-weight:600;color:#00ff88;margin-bottom:2px;">${callsign}</div>
+            <div>${type}</div>
+            <div>HDG ${heading}</div>
+          `
+
+          tooltipRef.current.style.display = 'block'
+          tooltipRef.current.style.left = `${event.clientX + 15}px`
+          tooltipRef.current.style.top = `${event.clientY + 15}px`
+        }
+        }else{
+          hoveredFlightRef.current = null
+          if (tooltipRef.current) tooltipRef.current.style.display = 'none'
+        }
+      }else {
+        hoveredFlightRef.current = null
+        if (tooltipRef.current) tooltipRef.current.style.display = 'none'
+      }
+    }
+
+    const canvas = rendererRef.current?.domElement
+    canvas?.addEventListener('mousemove', handleMouseMove)
+
+    return () => {
+      canvas?.removeEventListener('mousemove', handleMouseMove)
+    }
+  }, [flights, isFlightSelected])
 
   // Display major airport labels on the globe
 useEffect(() => {
