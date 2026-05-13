@@ -478,6 +478,7 @@ return (
   <div
     ref={mountRef}
     className="w-full h-full bg-black relative"
+    style={{ touchAction: 'none' }}
   >
     <div
       ref={tooltipRef}
