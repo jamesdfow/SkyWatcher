@@ -112,6 +112,6 @@ app.get('/api/airports/:icao', async (req, res) => {
     })
 
 //start the server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
 });
