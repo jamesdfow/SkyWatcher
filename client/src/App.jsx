@@ -23,17 +23,18 @@ function LiveFlightCount() {
   ).length
 
   return (
-    <div className="flex items-center gap-2">
-      <span className="relative flex h-2 w-2">
+    <div className="flex items-center gap-1.5 whitespace-nowrap">
+      <span className="relative flex h-2 w-2 shrink-0">
         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
       </span>
-      <span className="text-zinc-400 text-sm font-mono">
-        <span className="text-emerald-400 font-semibold">{count.toLocaleString()}</span> flights tracked
+      <span className="text-zinc-400 text-xs sm:text-sm font-mono">
+        <span className="text-emerald-400 font-semibold">{count.toLocaleString()}</span> tracked
       </span>
     </div>
   )
 }
+
 
 function AppContent() {
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -43,27 +44,22 @@ function AppContent() {
 
       {/* Header */}
       {!isFullscreen && (
-        <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/60 bg-zinc-950/90 backdrop-blur-md">
-          <div className="max-w-screen-2xl mx-auto px-6 h-14 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <h1 className="text-lg tracking-tight font-semibold">
-                <span className="text-emerald-400">Sky</span>
-                <span className="text-white">Watcher</span>
-              </h1>
-              <span className="text-zinc-700 text-sm hidden sm:inline">|</span>
-              <LiveFlightCount />
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsFullscreen(true)}
-                className="text-zinc-500 hover:text-white text-sm font-mono px-3 py-1.5 border border-zinc-800 rounded hover:border-zinc-600 transition-colors"
-                title="Fullscreen"
-              >
-                ⛶ Expand
-              </button>
-            </div>
-          </div>
-        </header>
+<header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/60 bg-zinc-950/90 backdrop-blur-md">
+<div className="max-w-screen-2xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+  <h1 className="text-base sm:text-lg tracking-tight font-semibold whitespace-nowrap">
+    <span className="text-emerald-400">Sky</span>
+    <span className="text-white">Watcher</span>
+  </h1>
+  <LiveFlightCount />
+  <button
+    onClick={() => setIsFullscreen(true)}
+    className="text-zinc-500 hover:text-white text-xs sm:text-sm font-mono px-2 sm:px-3 py-1.5 border border-zinc-800 rounded hover:border-zinc-600 transition-colors whitespace-nowrap"
+    title="Fullscreen"
+  >
+    ⛶ Expand
+  </button>
+</div>
+</header>
       )}
 
       {/* Globe viewport */}

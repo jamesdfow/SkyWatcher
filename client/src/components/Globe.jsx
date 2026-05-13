@@ -82,11 +82,17 @@ function GlobeComponent() {
     controls.dampingFactor = 1.5
     controls.minDistance = 100
     controls.maxDistance = 500
+    controls.zoomSpeed = 0.5
+    controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY }
 
     controlsRef.current = controls
 
     controls.addEventListener('change', () => {
       zoomLevelRef.current = camera.position.length()
+
+      const zoom = camera.position.length()
+      controls.rotateSpeed = Math.max(zoom / 500, 0.1)
+      controls.zoomSpeed = Math.max(zoom / 800, 0.3)
     })
 
     // When the user stops dragging, calculate the new center lat/lon
