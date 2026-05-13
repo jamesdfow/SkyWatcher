@@ -468,12 +468,18 @@ useEffect(() => {
     .labelResolution(2)
 }, [])
 
-  return (
+return (
+  <div
+    ref={mountRef}
+    className="w-full h-full bg-black relative"
+  >
     <div
-      ref={mountRef}
-      className="w-full h-full bg-black"
+      ref={tooltipRef}
+      className="fixed z-50 pointer-events-none hidden bg-zinc-900/90 border border-zinc-700 rounded px-3 py-2 text-xs font-mono text-zinc-300 backdrop-blur-sm"
+      style={{ display: 'none' }}
     />
-  )
+  </div>
+)
 }
 
 export default GlobeComponent
