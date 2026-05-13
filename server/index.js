@@ -16,13 +16,15 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 //CORS config - restrcts which origins can make requests to this server
-app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        'http://localhost:5174',
-        process.env.CLIENT_URL  
-    ].filter(Boolean)
-}));
+// app.use(cors({
+//     origin: [
+//         'http://localhost:5173',
+//         'http://localhost:5174',
+//         process.env.CLIENT_URL  
+//     ].filter(Boolean)
+// }));
+
+app.use(cors());
 
 // Parse incoming JSON request bodies
 app.use(express.json());
