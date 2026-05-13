@@ -154,7 +154,8 @@ useEffect(() => {
         </div>
         <div className="bg-white/5 rounded p-3 col-span-2">
           <p className="text-gray-400 text-xs mb-1">Operator</p>
-          <p className="text-white font-mono">{ownOp || 'N/A'}</p>
+          <p className="text-white font-mono">{routeData?.airline?.name || ownOp || 'N/A'}</p>
+
         </div>
       </div>
 
