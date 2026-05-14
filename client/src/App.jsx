@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import GlobeComponent from './components/Globe'
 import FlightCard from './components/FlightCard'
 import useGlobeStore from './store/globeStore'
+import Map2d from './components/Map2d'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,6 +39,7 @@ function LiveFlightCount() {
 
 function AppContent() {
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [viewMode, setViewMode] = useState('3d')
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
@@ -51,6 +53,30 @@ function AppContent() {
     <span className="text-white">Watcher</span>
   </h1>
   <LiveFlightCount />
+
+<div className="flex border border-zinc-800 rounded overflow-hidden">
+  <button
+    onClick={() => setViewMode('3d')}
+    className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-mono transition-colors ${
+      viewMode === '3d'
+        ? 'bg-emerald-400/10 text-emerald-400 border-r border-zinc-800'
+        : 'text-zinc-500 hover:text-white border-r border-zinc-800'
+    }`}
+  >
+    3D
+  </button>
+  <button
+    onClick={() => setViewMode('2d')}
+    className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-mono transition-colors ${
+      viewMode === '2d'
+        ? 'bg-emerald-400/10 text-emerald-400'
+        : 'text-zinc-500 hover:text-white'
+    }`}
+  >
+    2D
+  </button>
+</div>
+
   <button
     onClick={() => setIsFullscreen(true)}
     className="text-zinc-500 hover:text-white text-xs sm:text-sm font-mono px-2 sm:px-3 py-1.5 border border-zinc-800 rounded hover:border-zinc-600 transition-colors whitespace-nowrap"
@@ -71,7 +97,7 @@ function AppContent() {
         }
         style={!isFullscreen ? { height: 'calc(100vh - 3.5rem)' } : undefined}
       >
-        <GlobeComponent />
+        {viewMode === '3d' ? <GlobeComponent /> : <Map2d />}
         <FlightCard />
 
         {/* Fullscreen exit button */}
