@@ -49,7 +49,7 @@ useEffect(() => {
   }
 
   fetchData()
-}, [selectedFlight])
+}, [selectedFlight, setRouteData])
 
   if (!selectedFlight) return null
 
