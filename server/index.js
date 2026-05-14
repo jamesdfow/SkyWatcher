@@ -8,12 +8,18 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import axios from 'axios';
+import { createClient } from '@supabase/supabase-js';
 
 //Load environment variables from .env file in process.env
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_ANON_KEY
+)
 
 // CORS config - restrcts which origins can make requests to this server
 app.use(cors({
@@ -82,19 +88,6 @@ app.get('/api/route/:callsign', async (req, res) => {
         }
     })
 
-app.get('/api/airports/:icao', async (req, res) => {
-    try {
-        const { icao } = req.params
-        const response = await axios.get(
-            `https://ryanburnette.github.io/airports-api/icao/${icao.toLowerCase()}.json`
-        )
-        res.json(response.data)
-    } catch (error) {
-        console.error('Error fetching airport:', error.message)
-        res.status(500).json({ error: 'Failed to fetch airport data' })
-    }
-})
-
     //plaespotters photo proxy route
     //fetches aircraft photos by registration number
     //photos cannot be cacheed
@@ -110,6 +103,85 @@ app.get('/api/airports/:icao', async (req, res) => {
             res.status(500).json({ error: 'Failed to fetch photo' })
         }
     })
+
+    //Search airports by ICAO code, IATA code, or name
+    app.get('/api/airports/search', async (req, res) => {
+        try {
+            const { q } = req.query
+            if (!q || q.length < 2) {
+                return res.json({ airports: [] })
+            }
+            const { data, error } = await supabase
+                .from('Airports')
+                .select('*')
+                .or(`icao_code.ilike.%${q}%,iata_code.ilike.%${q}%,name.ilike.%${q}%`)
+                .limit(20)
+
+            if (error) throw error
+            res.json({ airports: data })
+        } catch (error) {
+            console.error('Error searching airports:', error.message)
+            res.status(500).json({ error: 'Failed to search airports' })
+        }
+    })
+// Get full airport details by ICAO code
+app.get('/api/airports/detail/:icao', async (req, res) => {
+    try {
+        const { icao } = req.params
+
+        const { data: airport, error: airportError } = await supabase
+            .from('Airports')
+            .select('*')
+            .eq('icao_code', icao.toUpperCase())
+            .single()
+
+        if (airportError) throw airportError
+
+        //Fetch runways for this airport
+        const { data: runways } = await supabase
+            .from('Runways')
+            .select('*')
+            .eq('airport_ident', icao.toUpperCase())
+
+        //Fetch frequencies for this airport
+        const { data: frequencies } = await supabase
+            .from('airport_frequencies')
+            // .select('frequency_mhz')
+            // .select('type')
+            // .select('description')
+            // .select('frequency_mhz, type, description')
+            .select('*')
+            .eq('airport_ident', icao.toUpperCase())
+        
+        res.json({
+            airport,
+            runways: runways || [],
+            frequencies: frequencies || []
+        })
+    } catch (error) {
+        console.error('Error fetching airport details:', error.message)
+        res.status(500).json({ error: 'Failed to fetch airport details' })
+    }
+})
+
+//Get regions
+app.get('/api/regions', async (req, res) => {
+    try {
+        const { continent } = req.query
+
+        let query = supabase.from('Regions').select('*')
+        if (continent) {
+            query = query.eq('continent', continent)
+        }
+
+        const { data, error } = await query.limit(500)
+        if (error) throw error
+        res.json({ regions: data })
+    } catch (error) {
+        console.error('Error fetching regions:', error.message)
+        res.status(500).json({ error: 'Failed to fetch regions' })
+    }
+})
 
 //start the server
 app.listen(PORT, '0.0.0.0', () => {
