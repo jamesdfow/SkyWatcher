@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Marker, Tooltip, useMapEvents } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Tooltip, Polyline, CircleMarker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import useGlobeStore from '../store/globeStore'
@@ -34,6 +34,8 @@ function MapController({ onMove, onZoom }) {
 function FlightMarkers({ zoom }) {
   const flights = useGlobeStore((state) => state.flights)
   const setSelectedFlight = useGlobeStore((state) => state.setSelectedFlight)
+  const selectedFlight = useGlobeStore((state) => state.selectedFlight)
+  const isFlightSelected = useGlobeStore((state) => state.isFlightSelected)
 
   const validFlights = flights.filter(
     (f) => f.lat != null && f.lon != null && commercialCategories.includes(f.category)
@@ -41,16 +43,16 @@ function FlightMarkers({ zoom }) {
 
   let displayFlights
 
-  if (zoom >= 6) {
+  if (isFlightSelected && selectedFlight) {
+    displayFlights = validFlights.filter((f) => f.hex === selectedFlight.hex)
+  } else if (zoom >= 6) {
     displayFlights = validFlights
   } else {
-    // Determine grid cell size based on zoom -- smaller cells = more flights shown
     let cellSize
     if (zoom <= 3) cellSize = 10
     else if (zoom <= 4) cellSize = 5
     else cellSize = 2
 
-    // Pick one flight per grid cell for even spatial distribution
     const grid = {}
     for (const flight of validFlights) {
       const cellKey = `${Math.floor(flight.lat / cellSize)},${Math.floor(flight.lon / cellSize)}`
@@ -81,6 +83,57 @@ function FlightMarkers({ zoom }) {
   ))
 }
 
+function RoutePolyLine() {
+    const routeData = useGlobeStore((state) => state.routeData)
+
+    if (
+      !routeData?.origin?.latitude ||
+      !routeData?.origin?.longitude ||
+      !routeData?.destination?.latitude ||
+      !routeData?.destination?.longitude
+    ) return null
+
+    const positions = [
+        [routeData.origin.latitude, routeData.origin.longitude],
+        [routeData.destination.latitude, routeData.destination.longitude]
+    ]
+
+    return (
+        <>
+        <Polyline 
+            positions={positions}
+            pathOptions={{
+                color: '#ff4444',
+                weight: 2,
+                dashArray: '8, 6',
+            }}
+        />
+        <CircleMarker 
+            center={[routeData.origin.latitude, routeData.origin.longitude]}
+            radius={5}
+            pathOptions={{ color: '#ff4444', fillColor: '#ff4444', fillOpacity: 1}}
+           >
+                <Tooltip direction="top" permanent>
+                    <span className="font-mono text-xs font-bold" style={{ color: '#ff4444' }}>
+                        {routeData.origin.iata_code || routeData.origin.icao_code}
+                    </span>
+                </Tooltip>
+        </CircleMarker>
+        <CircleMarker 
+            center={[routeData.destination.latitude, routeData.destination.longitude]}
+            radius={5}
+            pathOptions={{ color: '#ff4444', fillColor: '#ff4444', fillOpacity: 1}}
+           >
+                <Tooltip direction="top" permanent>
+                    <span className="font-mono text-xs font-bold" style={{ color: '#ff4444' }}>
+                        {routeData.destination.iata_code || routeData.destination.icao_code}
+                    </span>
+                </Tooltip>
+        </CircleMarker>
+        </>
+    )
+}
+
 export default function Map2D() {
   const [viewCenter, setViewCenter] = useState({ lat: 39.8283, lon: -98.5795 })
   const [zoom, setZoom] = useState(4)
@@ -102,6 +155,7 @@ export default function Map2D() {
         onZoom={(z) => setZoom(z)}
       />
       <FlightMarkers zoom={zoom} />
+      <RoutePolyLine />
     </MapContainer>
   )
 }

@@ -185,9 +185,9 @@ if (isFlightSelected && selectedFlight) {
   const getSize = () => {
     const zoom = zoomLevelRef.current
     if (isFlightSelected) return 0.6
-    if (zoom < 130) return 0.15
-    if (zoom < 180) return 0.2
-    if (zoom < 250) return 0.3
+    if (zoom < 130) return 0.4
+    if (zoom < 180) return 0.6
+    if (zoom < 250) return 0.99
     return 0.35
   }
 
