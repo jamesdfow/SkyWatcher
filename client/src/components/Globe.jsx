@@ -156,27 +156,38 @@ useEffect(() => {
     f.lat != null && f.lon != null && commercialCategories.includes(f.category)
   )
 
-  let displayFlights
+let displayFlights
 
-  if (isFlightSelected && selectedFlight) {
-    displayFlights = validFlights.filter((f) => f.hex === selectedFlight.hex)
+if (isFlightSelected && selectedFlight) {
+  displayFlights = validFlights.filter((f) => f.hex === selectedFlight.hex)
+} else {
+  const zoom = zoomLevelRef.current
+
+  if (zoom < 200) {
+    displayFlights = validFlights
   } else {
-    const zoom = zoomLevelRef.current
-    let maxFlights
-    if (zoom > 400) maxFlights = 50
-    else if (zoom > 300) maxFlights = 150
-    else if (zoom > 200) maxFlights = 500
-    else maxFlights = validFlights.length
+    let cellSize
+    if (zoom > 400) cellSize = 10
+    else if (zoom > 300) cellSize = 5
+    else cellSize = 2
 
-    displayFlights = validFlights.slice(0, maxFlights)
+    const grid = {}
+    for (const flight of validFlights) {
+      const cellKey = `${Math.floor(flight.lat / cellSize)},${Math.floor(flight.lon / cellSize)}`
+      if (!grid[cellKey]) {
+        grid[cellKey] = flight
+      }
+    }
+    displayFlights = Object.values(grid)
   }
+}
 
   const getSize = () => {
     const zoom = zoomLevelRef.current
     if (isFlightSelected) return 0.6
-    if (zoom < 130) return 0.15
-    if (zoom < 180) return 0.2
-    if (zoom < 250) return 0.3
+    if (zoom < 130) return 0.4
+    if (zoom < 180) return 0.6
+    if (zoom < 250) return 0.99
     return 0.35
   }
 

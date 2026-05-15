@@ -100,7 +100,8 @@ app.get('/api/route/:callsign', async (req, res) => {
             res.json(response.data)
         } catch (error) {
             console.error('Error fetching photo:', error.message)
-            res.status(500).json({ error: 'Failed to fetch photo' })
+            const status = error.response?.status || 500
+            res.status(status).json({ error: 'Failed to fetch photo', photos: []})
         }
     })
 
