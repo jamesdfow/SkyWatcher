@@ -7,6 +7,7 @@ import GlobeComponent from './components/Globe'
 import FlightCard from './components/FlightCard'
 import useGlobeStore from './store/globeStore'
 import Map2d from './components/Map2d'
+import AirportCard from './components/AirportCard'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -99,6 +100,7 @@ function AppContent() {
       >
         {viewMode === '3d' ? <GlobeComponent /> : <Map2d />}
         <FlightCard />
+        <AirportCard />
 
         {/* Fullscreen exit button */}
         {isFullscreen && (

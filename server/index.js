@@ -105,6 +105,34 @@ app.get('/api/route/:callsign', async (req, res) => {
         }
     })
 
+    app.get('/api/airports/bounds', async(req, res) => {
+        try {
+            const { south, north, west, east, types } = req.query
+
+            if (!south || !north || !west || !east || !types) {
+                return res.status(400).json({ error: 'Missing required parameters '})
+            }
+
+            const typeArray = types.split(',')
+
+            const { data, error} = await supabase
+                .from('Airports')
+                .select('id, ident, type, name, latitude_deg, longitude_deg, iata_code, icao_code, municipality')
+                .in('type', typeArray)
+                .gte('latitude_deg', parseFloat(south))
+                .lte('latitude_deg', parseFloat(north))
+                .gte('longitude_deg', parseFloat(west))
+                .lte('longitude_deg', parseFloat(east))
+                .limit(2000)
+
+            if (error) throw error
+            res.json(data)
+        } catch (error) {
+            console.error('Error fetching airports by bounds:', error.message)
+            res.status(500).json({ error: 'Failed to fetch airports' })
+        }
+    })
+
     //Search airports by ICAO code, IATA code, or name
     app.get('/api/airports/search', async (req, res) => {
         try {
