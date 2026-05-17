@@ -325,7 +325,7 @@ if (isFlightSelected && selectedFlight) {
         .arcDashGap(0.1)
         .arcDashAnimateTime(2000)
         .arcStroke(0.15)
-        .arcAltitude(0.1)
+        .arcAltitude(0.2)
 
         // Add origin/dest labels alongside major airports
       const routeAirports = [

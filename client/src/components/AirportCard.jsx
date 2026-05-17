@@ -15,7 +15,7 @@ function AirportCard() {
   const { airport, runways, frequencies } = selectedAirport
 
   return (
-    <div className="absolute top-[calc(50%+0.75rem)] right-6 bottom-6 w-80 max-sm:top-auto max-sm:bottom-0 max-sm:right-0 max-sm:left-0 max-sm:w-full max-sm:max-h-[45vh] overflow-y-auto bg-black/50 border border-amber-500/30 rounded-lg text-white backdrop-blur-sm z-[1000]">
+    <div className="absolute top-[calc(50%+0.75rem)] right-6 bottom-6 w-100 max-sm:top-auto max-sm:bottom-0 max-sm:right-0 max-sm:left-0 max-sm:w-full max-sm:max-h-[45vh] overflow-y-auto bg-black/80 border border-amber-500/30 rounded-lg text-white backdrop-blur-sm z-[1000]">
       <div className="p-5">
 
         {/* Header */}
@@ -48,10 +48,10 @@ function AirportCard() {
             <p className="text-gray-400 text-xs mb-1">Elevation</p>
             <p className="text-white font-mono">{airport.elevation_ft ? `${airport.elevation_ft} ft` : 'N/A'}</p>
           </div>
-          <div className="bg-white/5 rounded p-3">
+          {/* <div className="bg-white/5 rounded p-3">
             <p className="text-gray-400 text-xs mb-1">Continent</p>
             <p className="text-white font-mono">{airport.continent || 'N/A'}</p>
-          </div>
+          </div> */}
           <div className="bg-white/5 rounded p-3">
             <p className="text-gray-400 text-xs mb-1">Country</p>
             <p className="text-white font-mono">{airport.iso_country || 'N/A'}</p>
@@ -73,6 +73,10 @@ function AirportCard() {
             {runways.map((runway, i) => (
               <div key={i} className="bg-white/5 rounded p-3 mb-2 last:mb-0">
                 <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="text-gray-400">Runway: </span>
+                    <span className="text-white font-mono">{runway.le_ident ? `${runway.le_ident}` : 'N/A'}</span>
+                  </div>
                   <div>
                     <span className="text-gray-400">Length: </span>
                     <span className="text-white font-mono">{runway.length_ft ? `${runway.length_ft} ft` : 'N/A'}</span>
@@ -125,7 +129,9 @@ function AirportCard() {
         )}
 
         {/* Links */}
+        
         <div className="flex gap-3 mb-3">
+          <span className="text-amber-400">Links: </span>
           {airport.home_link && (
             
               <a href={airport.home_link}

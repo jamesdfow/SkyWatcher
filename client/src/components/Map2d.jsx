@@ -33,7 +33,7 @@ function createAirportIcon(type) {
     html: `<svg width="10" height="10" viewBox="0 0 10 10">
       <circle cx="5" cy="5" r="4" fill="${color}" stroke="#1e1e1e" stroke-width="1"/>
     </svg>`,
-    iconSize: [10, 10],
+    iconSize: [8, 8],
     iconAnchor: [5, 5],
   })
 }
