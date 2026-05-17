@@ -72,7 +72,7 @@ useEffect(() => {
   const dest = routeData?.destination?.iata_code || routeData?.destination?.icao_code || '???'
 
   return (
-    <div className="absolute top-6 right-6 w-80 max-sm:top-auto max-sm:bottom-0 max-sm:right-0 max-sm:left-0 max-sm:w-full max-sm:max-h-[45vh] max-sm:overflow-y-auto max-sm:rounded-t-lg max-sm:rounded-b-none bg-black/50 border border-green-500/30 rounded-lg overflow-hidden text-white backdrop-blur-sm z-[1000]">
+    <div className="absolute top-6 right-6 w-100 max-sm:top-auto max-sm:bottom-0 max-sm:right-0 max-sm:left-0 max-sm:w-full max-sm:max-h-[45vh] max-sm:overflow-y-auto max-sm:rounded-t-lg max-sm:rounded-b-none bg-black/90 border border-green-500/30 rounded-lg overflow-hidden text-white backdrop-blur-sm z-[1000]">
 
       {/* Aircraft photo */}
       {photoData && (
