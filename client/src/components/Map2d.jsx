@@ -12,10 +12,8 @@ const commercialCategories = ['A2', 'A3', 'A4', 'A5']
 function createPlaneIcon(heading) {
   return L.divIcon({
     className: '',
-    html: `<svg width="16" height="16" viewBox="0 0 16 16" style="transform: rotate(${heading || 0}deg)">
-      <path d="M8 1 L10 6 L14 7 L10 8 L10 13 L8 12 L6 13 L6 8 L2 7 L6 6 Z" fill="#34d399" stroke="#064e3b" stroke-width="0.5"/>
-    </svg>`,
-    iconSize: [16, 16],
+    html: `<div style="transform: rotate(${heading || 0}deg); color: #34d399; font-size: 16px; line-height: 1; text-align: center;">▲</div>`,
+    iconSize: [10, 10],
     iconAnchor: [8, 8],
   })
 }
@@ -332,7 +330,18 @@ export default function Map2D() {
   const [airportFilters, setAirportFilters] = useState(['large_airport'])
   const [airports, setAirports] = useState([])
 
-  useFlights(viewCenter.lat, viewCenter.lon, 2500)
+  // Calculate radius in nautical miles from viewport bounds
+const radiusNm = bounds
+  ? Math.min(
+      Math.sqrt(
+        Math.pow((bounds.north - bounds.south) / 2, 2) +
+        Math.pow((bounds.east - bounds.west) / 2, 2)
+      ) * 60,
+      2500
+    )
+  : 250
+
+useFlights(viewCenter.lat, viewCenter.lon, Math.round(radiusNm))
 
   // Fetch airports when bounds or filters change
 useEffect(() => {

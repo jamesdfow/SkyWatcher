@@ -202,25 +202,13 @@ if (isFlightSelected && selectedFlight) {
       const heading = f.track || 0
       return { x: 0, y: 0, z: -heading }
     })
+
     .objectThreeObject(() => {
-      // Create a plane shape
       const shape = new THREE.Shape()
-      // Nose
+      //triangle
       shape.moveTo(0, 1)
-      // Right wing
-      shape.lineTo(0.6, -0.2)
-      shape.lineTo(0.15, -0.1)
-      // Tail right
-      shape.lineTo(0.15, -0.7)
-      shape.lineTo(0.35, -1)
-      // Tail bottom
-      shape.lineTo(0, -0.8)
-      // Tail left (mirror)
-      shape.lineTo(-0.35, -1)
-      shape.lineTo(-0.15, -0.7)
-      shape.lineTo(-0.15, -0.1)
-      // Left wing
-      shape.lineTo(-0.6, -0.2)
+      shape.lineTo(-0.5, -0.5)
+      shape.lineTo(0.5, -0.5)
       shape.closePath()
 
       const geometry = new THREE.ShapeGeometry(shape)
@@ -229,11 +217,13 @@ if (isFlightSelected && selectedFlight) {
       const material = new THREE.MeshBasicMaterial({
         color: 0x00ff88,
         side: THREE.DoubleSide,
-      })
-
-      const mesh = new THREE.Mesh(geometry, material)
-      return mesh
     })
+
+    const mesh = new THREE.Mesh(geometry, material)
+    return mesh
+
+        })
+
 }, [flights, selectedFlight, isFlightSelected])
 
   // Handle click events on the globe canvas
