@@ -114,7 +114,7 @@ function AppContent() {
 
         {/* Scroll indicator -- only when not fullscreen */}
         {!isFullscreen && (
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 animate-bounce">
+          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 animate-bounce">
             <div className="flex flex-col items-center gap-1 text-zinc-600">
               <span className="text-xs font-mono">Scroll to learn more</span>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-zinc-600">
