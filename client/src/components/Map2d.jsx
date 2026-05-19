@@ -391,11 +391,13 @@ useEffect(() => {
           onZoom={(z) => setZoom(z)}
           onBoundsChange={setBounds}
         />
+        
         <ZoomControl position="bottomleft" />
         <FlightMarkers zoom={zoom} bounds={bounds}/>
         <MapClickHandler bounds={bounds} />
         <RoutePolyLine />
         <AirportMarkers airports={airports} />
+        
       </MapContainer>
     </div>
   )
