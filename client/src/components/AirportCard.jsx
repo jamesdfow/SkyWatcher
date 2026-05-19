@@ -15,7 +15,7 @@ function AirportCard() {
   const { airport, runways, frequencies } = selectedAirport
 
   return (
-    <div className="absolute top-[calc(50%+0.75rem)] right-6 bottom-6 w-100 max-sm:top-auto max-sm:bottom-0 max-sm:right-0 max-sm:left-0 max-sm:w-full max-sm:max-h-[45vh] overflow-y-auto bg-black/80 border border-amber-500/30 rounded-lg text-white backdrop-blur-sm z-[1000]">
+    <div className="absolute top-[calc(50%+0.75rem)] right-6 bottom-6 w-80 max-sm:top-auto max-sm:bottom-0 max-sm:right-0 max-sm:left-0 max-sm:w-full max-sm:max-h-[45vh] overflow-y-auto bg-black/80 border border-amber-500/30 rounded-lg text-white backdrop-blur-sm z-[1000]">
       <div className="p-5">
 
         {/* Header */}
